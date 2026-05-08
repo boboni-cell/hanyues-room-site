@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — A Room That Grows With Me</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5efe6;
+            --paper: #fffdf8;
+            --paper-aged: #f8f0e0;
+            --paper-yellow: #fff8e1;
+            --paper-blue: #ecf1f6;
+            --paper-pink: #faf0ee;
+            --ink: #2d2d2d;
+            --ink-light: #6a6a6a;
+            --ink-faint: #a0a0a0;
+            --accent: #b88a5a;
+            --tape: rgba(255, 248, 218, 0.72);
+            --tape-border: rgba(200, 180, 140, 0.35);
+
+            --font-hand: 'Caveat', cursive;
+            --font-type: 'Special Elite', monospace;
+            --font-serif: 'DM Serif Display', serif;
+            --font-body: 'Source Sans 3', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            line-height: 1.75;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
+        }
+
+        /* ── Navigation ───────────────────────── */
+        .top-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: rgba(245,240,232,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            z-index: 1000;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        .nav-link {
+            color: var(--ink);
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: opacity .3s;
+            position: relative;
+        }
+        .nav-link:hover { opacity: .55; }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px; left: 12px; right: 12px;
+            height: 1px;
+            background: var(--ink);
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 0; right: 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            z-index: 1001;
+        }
+        .lang-btn {
+            background: none; border: none;
+            font: 12px/1 var(--font-body);
+            letter-spacing: 1px;
+            cursor: pointer;
+            padding: 5px 7px;
+            color: #999;
+            transition: color .2s;
+        }
+        .lang-btn:hover { color: var(--ink); }
+        .lang-btn.active { color: var(--ink); font-weight: 600; border-bottom: 1px solid var(--ink); }
+        .lang-divider { color: #ccc; font-size: 11px; }
+
+        /* ── Page ─────────────────────────────── */
+        .page {
+            margin-top: 60px;
+            max-width: 740px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 70px 28px 140px;
+        }
+
+        /* ── Helpers ──────────────────────────── */
+        .tape {
+            position: absolute;
+            width: 76px; height: 20px;
+            background: var(--tape);
+            border: 1px solid var(--tape-border);
+            z-index: 2;
+        }
+
+        /* ── 1  Room Owner's Note ─────────────── */
+        .owner-note {
+            background: var(--paper);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+            padding: 44px 42px;
+            margin-bottom: 56px;
+            position: relative;
+            transform: rotate(-0.6deg);
+        }
+
+        .owner-note .tape {
+            top: -9px; left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+        }
+
+        .owner-label {
+            font-family: var(--font-type);
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: var(--ink-faint);
+            text-transform: uppercase;
+            margin-bottom: 22px;
+        }
+
+        .owner-name {
+            font-family: var(--font-serif);
+            font-size: 30px;
+            line-height: 1.2;
+            margin-bottom: 3px;
+        }
+
+        .owner-name-cn {
+            font-size: 15px;
+            color: var(--ink-light);
+            font-weight: 300;
+            margin-bottom: 24px;
+        }
+
+        .owner-body {
+            font-size: 15px;
+            color: var(--ink-light);
+            line-height: 1.95;
+        }
+
+        .owner-stamp {
+            position: absolute;
+            bottom: 18px; right: 28px;
+            font-family: var(--font-hand);
+            font-size: 13px;
+            color: var(--accent);
+            transform: rotate(5deg);
+            opacity: .6;
+        }
+
+        /* ── 2  What I Care About ─────────────── */
+        .care-section {
+            margin-bottom: 56px;
+        }
+
+        .section-hand-label {
+            font-family: var(--font-hand);
+            font-size: 22px;
+            color: var(--ink);
+            margin-bottom: 18px;
+        }
+
+        .care-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .care-tag {
+            font-family: var(--font-type);
+            font-size: 11px;
+            padding: 7px 15px;
+            background: var(--paper);
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 1px 2px 4px rgba(0,0,0,0.04);
+            color: var(--ink);
+            letter-spacing: .4px;
+            transition: transform .2s;
+        }
+
+        .care-tag:nth-child(1) { transform: rotate(-1.2deg); }
+        .care-tag:nth-child(2) { transform: rotate(0.7deg); background: var(--paper-yellow); }
+        .care-tag:nth-child(3) { transform: rotate(-0.4deg); }
+        .care-tag:nth-child(4) { transform: rotate(1.1deg); background: var(--paper-blue); }
+        .care-tag:nth-child(5) { transform: rotate(-0.8deg); background: var(--paper-pink); }
+        .care-tag:nth-child(6) { transform: rotate(0.5deg); }
+        .care-tag:nth-child(7) { transform: rotate(-1deg); background: var(--paper-yellow); }
+        .care-tag:nth-child(8) { transform: rotate(0.9deg); background: var(--paper-blue); }
+
+        .care-tag:hover { transform: rotate(0deg) translateY(-2px); }
+
+        /* ── 3  Education ─────────────────────── */
+        .edu-record {
+            background: var(--paper);
+            border: 2px solid var(--ink);
+            overflow: hidden;
+            margin-bottom: 56px;
+            transform: rotate(-0.4deg);
+            position: relative;
+        }
+
+        .edu-bar {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 12px 26px;
+            font-family: var(--font-type);
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .edu-inner { padding: 26px 30px; }
+
+        .edu-row {
+            padding: 14px 0;
+        }
+
+        .edu-row + .edu-row { border-top: 1px dashed #ddd; }
+
+        .edu-years {
+            font-family: var(--font-type);
+            font-size: 11px;
+            color: var(--ink-faint);
+            margin-bottom: 2px;
+        }
+
+        .edu-school {
+            font-family: var(--font-serif);
+            font-size: 17px;
+        }
+
+        .edu-dept {
+            font-size: 13px;
+            color: var(--ink-light);
+        }
+
+        .edu-whisper {
+            font-family: var(--font-hand);
+            font-size: 15px;
+            color: var(--accent);
+            margin-top: 18px;
+        }
+
+        /* ── 4  Things That Stay ──────────────── */
+        .stay-section {
+            margin-bottom: 56px;
+        }
+
+        .stay-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stay-item {
+            font-size: 13px;
+            padding: 6px 14px;
+            background: var(--paper-aged);
+            border: 1px solid rgba(0,0,0,0.06);
+            color: var(--ink-light);
+        }
+
+        .stay-item:nth-child(even) { background: var(--paper); }
+
+        /* ── 5  Contact ───────────────────────── */
+        .contact-slip {
+            background: var(--paper-yellow);
+            box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+            padding: 26px 30px;
+            max-width: 320px;
+            margin: 0 auto;
+            transform: rotate(1deg);
+            position: relative;
+        }
+
+        .contact-slip .tape {
+            top: -9px; right: 24px;
+            transform: rotate(6deg);
+        }
+
+        .contact-title {
+            font-family: var(--font-hand);
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .contact-line {
+            font-size: 13px;
+            color: var(--ink-light);
+        }
+
+        .contact-line a {
+            color: var(--ink);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--ink-faint);
+        }
+
+        .contact-line a:hover { border-bottom-color: var(--ink); }
+
+        /* ── Footer ───────────────────────────── */
+        .page-end {
+            text-align: center;
+            margin-top: 64px;
+            font-family: var(--font-hand);
+            font-size: 14px;
+            color: var(--ink-faint);
+        }
+
+        /* ── Entrance ─────────────────────────── */
+        .fade-in {
+            opacity: 0;
+            animation: rise .55s ease forwards;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .owner-note   { animation-delay: .08s; }
+        .care-section { animation-delay: .16s; }
+        .edu-record   { animation-delay: .22s; }
+        .stay-section { animation-delay: .28s; }
+        .contact-slip { animation-delay: .34s; }
+
+        /* ── Responsive ───────────────────────── */
+        @media (max-width: 768px) {
+            .top-nav {
+                justify-content: flex-start;
+                padding-left: 16px;
+                padding-right: 92px;
+                gap: 10px;
+                font-size: 10px;
+                letter-spacing: 0.6px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .top-nav::-webkit-scrollbar { display: none; }
+            .nav-link { flex: 0 0 auto; padding: 8px 8px; }
+            .lang-switcher {
+                top: 8px;
+                right: 10px;
+                height: auto;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 4px;
+            }
+            .lang-divider { display: none; }
+            .lang-btn { font-size: 10px; padding: 3px 6px; }
+            .page { padding: 48px 18px 100px; }
+            .owner-note { padding: 32px 24px; transform: rotate(0); }
+            .owner-name { font-size: 26px; }
+            .edu-record { transform: rotate(0); }
+            .contact-slip { transform: rotate(0); max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <a href="about.html" class="nav-link active">ABOUT</a>
+        <a href="work.html" class="nav-link">WORK</a>
+        <a href="index.html" class="nav-link">ROOM</a>
+        <a href="thoughts.html" class="nav-link">THOUGHTS</a>
+        <a href="playlist.html" class="nav-link">PLAYLIST</a>
+    </nav>
+
+    <div class="lang-switcher">
+        <button class="lang-btn active" id="btnEN" onclick="switchLang('en')">EN</button>
+        <span class="lang-divider">/</span>
+        <button class="lang-btn" id="btnCN" onclick="switchLang('cn')">CN</button>
+    </div>
+
+    <!-- Page -->
+    <div class="page">
+
+        <!-- 1 ── Room Owner's Note ──────────── -->
+        <div class="owner-note fade-in">
+            <div class="tape"></div>
+
+            <div class="owner-label"
+                data-en="room owner's note"
+                data-cn="房间主人的纸条">room owner's note</div>
+
+            <div class="owner-name">Zhang Hanyue</div>
+            <div class="owner-name-cn">张瀚月</div>
+
+            <p class="owner-body"
+                data-en="Hi, I'm Hanyue. I'm a visual designer currently living and studying in Korea. I'm drawn to the small traces people leave behind — notes, rooms, objects, memories — and I often try to turn those quiet details into visual stories. This room is where I keep the things I've made and the things I care about."
+                data-cn="你好，我是瀚月。现在在韩国学习和生活，也在慢慢搭建这个属于自己的房间。我喜欢观察人留下的痕迹：纸条、房间、物件、记忆，然后把这些安静的细节整理成视觉故事。这个房间装着我做过的东西，和我在意的东西。">
+                Hi, I'm Hanyue. I'm a visual designer currently living and studying in Korea. I'm drawn to the small traces people leave behind — notes, rooms, objects, memories — and I often try to turn those quiet details into visual stories. This room is where I keep the things I've made and the things I care about.
+            </p>
+
+            <span class="owner-stamp">room in progress ✦</span>
+        </div>
+
+        <!-- 2 ── What I Care About ──────────── -->
+        <div class="care-section fade-in">
+            <div class="section-hand-label"
+                data-en="✦ what i care about in design"
+                data-cn="✦ 在设计里我在意的事">✦ what i care about in design</div>
+
+            <div class="care-tags">
+                <span class="care-tag" data-en="visual storytelling" data-cn="视觉叙事">visual storytelling</span>
+                <span class="care-tag" data-en="quiet details" data-cn="安静的细节">quiet details</span>
+                <span class="care-tag" data-en="brand identity" data-cn="品牌识别">brand identity</span>
+                <span class="care-tag" data-en="layout &amp; rhythm" data-cn="排版与节奏">layout &amp; rhythm</span>
+                <span class="care-tag" data-en="life traces" data-cn="生活痕迹">life traces</span>
+                <span class="care-tag" data-en="AI-assisted creation" data-cn="AI辅助创作">AI-assisted creation</span>
+                <span class="care-tag" data-en="objects &amp; memories" data-cn="物件与记忆">objects &amp; memories</span>
+                <span class="care-tag" data-en="making things feel human" data-cn="让设计保留人的温度">making things feel human</span>
+            </div>
+        </div>
+
+        <!-- 3 ── Education ──────────────────── -->
+        <div class="edu-record fade-in" id="education">
+            <div class="edu-bar"
+                data-en="where i'm growing"
+                data-cn="正在成长的地方">where i'm growing</div>
+
+            <div class="edu-inner">
+                <div class="edu-row">
+                    <div class="edu-years">2024 — 2026</div>
+                    <div class="edu-school">Hanyang University, Seoul</div>
+                    <div class="edu-dept" data-en="Visual Design, M.A." data-cn="视觉设计 · 硕士">Visual Design, M.A.</div>
+                </div>
+
+                <div class="edu-row">
+                    <div class="edu-years">2017 — 2021</div>
+                    <div class="edu-school">Hubei Institute of Fine Arts, Wuhan</div>
+                    <div class="edu-dept" data-en="Film &amp; Media Art, B.A." data-cn="影像媒体艺术 · 本科">Film &amp; Media Art, B.A.</div>
+                </div>
+
+                <div class="edu-whisper"
+                    data-en="the jacket on the chair belongs to this chapter. ↗"
+                    data-cn="椅子上的那件外套，属于这一段时间。 ↗">the jacket on the chair belongs to this chapter. ↗</div>
+            </div>
+        </div>
+
+        <!-- 4 ── Things That Stay With Me ───── -->
+        <div class="stay-section fade-in">
+            <div class="section-hand-label"
+                data-en="✦ a few things that stay with me"
+                data-cn="✦ 一直留在身边的东西">✦ a few things that stay with me</div>
+
+            <div class="stay-items">
+                <span class="stay-item" data-en="my cat Haiyan" data-cn="我的猫 海燕">my cat Haiyan</span>
+                <span class="stay-item" data-en="film cameras from another room" data-cn="从另一个房间带来的胶卷相机">film cameras from another room</span>
+                <span class="stay-item" data-en="posters &amp; paper scraps" data-cn="海报和纸片">posters &amp; paper scraps</span>
+                <span class="stay-item" data-en="a messy but organized desk" data-cn="杂乱中有序的书桌">a messy but organized desk</span>
+                <span class="stay-item" data-en="music while working" data-cn="工作时听的音乐">music while working</span>
+                <span class="stay-item" data-en="rooms I have lived in" data-cn="我住过的房间">rooms I have lived in</span>
+                <span class="stay-item" data-en="unfinished ideas" data-cn="没完成但被记下来的想法">unfinished ideas</span>
+            </div>
+        </div>
+
+        <!-- 5 ── Contact ────────────────────── -->
+        <div class="contact-slip fade-in">
+            <div class="tape"></div>
+
+            <div class="contact-title"
+                data-en="leave a note by the window ✿"
+                data-cn="在窗边留张纸条 ✿">leave a note by the window ✿</div>
+
+            <div class="contact-line">
+                ✉ <a href="mailto:zhyyyy0706@gmail.com">zhyyyy0706@gmail.com</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="page-end fade-in"
+            data-en="this page is a living document. it changes as i do."
+            data-cn="这一页是活的。它会跟着我一起变。">
+            this page is a living document. it changes as i do.
+        </div>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let currentLang = 'en';
+
+        function switchLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-en]').forEach(function(el) {
+                el.innerHTML = el.getAttribute('data-' + lang);
+            });
+            document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+            document.getElementById('btnCN').classList.toggle('active', lang === 'cn');
+            localStorage.setItem('preferredLang', lang);
+        }
+
+        (function() {
+            var saved = localStorage.getItem('preferredLang') || 'en';
+            switchLang(saved);
+        })();
+    </script>
+
+</body>
+</html>

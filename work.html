@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work — A Room That Grows With Me</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=DM+Serif+Display&family=Source+Sans+3:wght@300;400;500&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5efe6;
+            --paper: #fffdf8;
+            --paper-aged: #f8f0e0;
+            --paper-yellow: #fff8e1;
+            --paper-blue: #ecf1f6;
+            --paper-pink: #faf0ee;
+            --ink: #2d2d2d;
+            --ink-light: #6a6a6a;
+            --ink-faint: #a0a0a0;
+            --accent: #b88a5a;
+            --tape: rgba(255, 248, 218, 0.72);
+            --tape-border: rgba(200, 180, 140, 0.35);
+
+            --font-hand: 'Caveat', cursive;
+            --font-type: 'Special Elite', monospace;
+            --font-serif: 'DM Serif Display', serif;
+            --font-body: 'Source Sans 3', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            line-height: 1.75;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
+        }
+
+        /* ── Navigation ───────────────────────── */
+        .top-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            background: rgba(245,240,232,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            z-index: 1000;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+        .nav-link {
+            color: var(--ink);
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: opacity .3s;
+            position: relative;
+        }
+        .nav-link:hover { opacity: .55; }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px; left: 12px; right: 12px;
+            height: 1px;
+            background: var(--ink);
+        }
+
+        .lang-switcher {
+            position: fixed;
+            top: 0; right: 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            z-index: 1001;
+        }
+        .lang-btn {
+            background: none; border: none;
+            font: 12px/1 var(--font-body);
+            letter-spacing: 1px;
+            cursor: pointer;
+            padding: 5px 7px;
+            color: #999;
+            transition: color .2s;
+        }
+        .lang-btn:hover { color: var(--ink); }
+        .lang-btn.active { color: var(--ink); font-weight: 600; border-bottom: 1px solid var(--ink); }
+        .lang-divider { color: #ccc; font-size: 11px; }
+
+        /* ── Page ─────────────────────────────── */
+        .page {
+            margin-top: 60px;
+            max-width: 860px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 70px 28px 140px;
+        }
+
+        /* ── Tape helper ─────────────────────── */
+        .tape {
+            position: absolute;
+            width: 76px; height: 20px;
+            background: var(--tape);
+            border: 1px solid var(--tape-border);
+            z-index: 2;
+        }
+
+        /* ── 1  Header ────────────────────────── */
+        .work-header {
+            margin-bottom: 48px;
+        }
+
+        .work-title {
+            font-family: var(--font-serif);
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .work-subtitle {
+            font-size: 14px;
+            color: var(--ink-light);
+            line-height: 1.7;
+        }
+
+        /* ── 2  Category Tags ─────────────────── */
+        .category-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 48px;
+        }
+
+        .cat-tag {
+            font-family: var(--font-type);
+            font-size: 11px;
+            letter-spacing: .5px;
+            padding: 6px 16px;
+            background: var(--paper);
+            border: 1px solid rgba(0,0,0,0.1);
+            color: var(--ink-light);
+            cursor: default;
+            transition: all .2s;
+        }
+
+        .cat-tag.active-tag {
+            background: var(--ink);
+            color: var(--paper);
+            border-color: var(--ink);
+        }
+
+        /* ── 3  Project Cards ─────────────────── */
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+            margin-bottom: 64px;
+        }
+
+        .project-card {
+            background: var(--paper);
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 2px 3px 10px rgba(0,0,0,0.05);
+            position: relative;
+            display: flex;
+            transition: transform .25s, box-shadow .25s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 3px 6px 20px rgba(0,0,0,0.09);
+        }
+
+        .project-card:nth-child(1) { transform: rotate(-0.3deg); }
+        .project-card:nth-child(2) { transform: rotate(0.25deg); }
+        .project-card:nth-child(3) { transform: rotate(-0.2deg); }
+        .project-card:nth-child(1):hover { transform: rotate(-0.3deg) translateY(-3px); }
+        .project-card:nth-child(2):hover { transform: rotate(0.25deg) translateY(-3px); }
+        .project-card:nth-child(3):hover { transform: rotate(-0.2deg) translateY(-3px); }
+
+        /* Left tab — file folder tab */
+        .project-tab {
+            width: 54px;
+            min-height: 100%;
+            background: var(--ink);
+            color: var(--paper);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-family: var(--font-type);
+            font-size: 10px;
+            letter-spacing: 3px;
+            flex-shrink: 0;
+        }
+
+        /* Right content */
+        .project-body {
+            flex: 1;
+            padding: 32px 34px;
+            position: relative;
+        }
+        .project-card:nth-child(1) .project-body {
+              background: var(--paper-yellow);
+        }
+
+        .project-card:nth-child(2) .project-body {
+              background: var(--paper-blue);
+         }
+
+        .project-card:nth-child(3) .project-body {
+              background: var(--paper-pink);
+         }
+
+        .project-body .tape {
+            top: -9px; right: 28px;
+            transform: rotate(4deg);
+        }
+
+        .project-number {
+            font-family: var(--font-type);
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: var(--ink-faint);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .project-name {
+            font-family: var(--font-serif);
+            font-size: 22px;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .project-type {
+            font-family: var(--font-type);
+            font-size: 11px;
+            color: var(--ink-faint);
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .project-desc {
+            font-size: 14px;
+            color: var(--ink-light);
+            line-height: 1.75;
+            margin-bottom: 18px;
+        }
+
+        /* Meta row */
+        .project-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .meta-chip {
+            font-size: 11px;
+            padding: 4px 10px;
+            background: var(--paper-aged);
+            border: 1px solid rgba(0,0,0,0.05);
+            color: var(--ink-light);
+        }
+
+        .meta-chip.year {
+            font-family: var(--font-type);
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* View link */
+        .project-link {
+            display: inline-block;
+            font-family: var(--font-type);
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--ink);
+            text-decoration: none;
+            padding: 7px 18px;
+            border: 1px solid var(--ink);
+            transition: background .2s, color .2s;
+        }
+
+        .project-link:hover {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        /* ── 4  Footer ────────────────────────── */
+        .page-end {
+            text-align: center;
+            font-family: var(--font-hand);
+            font-size: 15px;
+            color: var(--ink-faint);
+        }
+
+        /* ── Entrance ─────────────────────────── */
+        .fade-in {
+            opacity: 0;
+            animation: rise .55s ease forwards;
+        }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .work-header    { animation-delay: .06s; }
+        .category-bar   { animation-delay: .12s; }
+        .project-card:nth-child(1) { animation-delay: .18s; }
+        .project-card:nth-child(2) { animation-delay: .24s; }
+        .project-card:nth-child(3) { animation-delay: .30s; }
+        .page-end       { animation-delay: .36s; }
+
+        /* ── Responsive ───────────────────────── */
+        @media (max-width: 768px) {
+            .top-nav {
+                justify-content: flex-start;
+                padding-left: 16px;
+                padding-right: 92px;
+                gap: 10px;
+                font-size: 10px;
+                letter-spacing: 0.6px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .top-nav::-webkit-scrollbar { display: none; }
+            .nav-link { flex: 0 0 auto; padding: 8px 8px; }
+            .lang-switcher {
+                top: 8px;
+                right: 10px;
+                height: auto;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 4px;
+            }
+            .lang-divider { display: none; }
+            .lang-btn { font-size: 10px; padding: 3px 6px; }
+            .page { padding: 48px 16px 100px; }
+            .work-title { font-size: 28px; }
+
+            .project-card {
+                flex-direction: column;
+                transform: rotate(0) !important;
+            }
+            .project-card:hover {
+                transform: translateY(-3px) !important;
+            }
+
+            .project-tab {
+                width: 100%;
+                min-height: auto;
+                writing-mode: horizontal-tb;
+                padding: 10px 20px;
+                justify-content: flex-start;
+            }
+
+            .project-body { padding: 24px 20px; }
+            .project-name { font-size: 19px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <a href="about.html" class="nav-link">ABOUT</a>
+        <a href="work.html" class="nav-link active">WORK</a>
+        <a href="index.html" class="nav-link">ROOM</a>
+        <a href="thoughts.html" class="nav-link">THOUGHTS</a>
+        <a href="playlist.html" class="nav-link">PLAYLIST</a>
+    </nav>
+
+    <div class="lang-switcher">
+        <button class="lang-btn active" id="btnEN" onclick="switchLang('en')">EN</button>
+        <span class="lang-divider">/</span>
+        <button class="lang-btn" id="btnCN" onclick="switchLang('cn')">CN</button>
+    </div>
+
+    <!-- Page -->
+    <div class="page">
+
+        <!-- 1 ── Header ─────────────────────── -->
+        <div class="work-header fade-in">
+            <h1 class="work-title" data-en="Selected Works" data-cn="作品选集">Selected Works</h1>
+            <p class="work-subtitle"
+                data-en="A small archive of projects I made, revised, and learned from."
+                data-cn="一些我做过、修改过、也从中学到东西的项目。">
+                A small archive of projects I made, revised, and learned from.
+            </p>
+        </div>
+
+        <!-- 2 ── Category Tags ──────────────── -->
+        <div class="category-bar fade-in">
+            <span class="cat-tag active-tag" data-en="All" data-cn="全部">All</span>
+            <span class="cat-tag" data-en="Marketing" data-cn="营销">Marketing</span>
+            <span class="cat-tag" data-en="Operation" data-cn="运营">Operation</span>
+            <span class="cat-tag" data-en="Branding" data-cn="品牌">Branding</span>
+            <span class="cat-tag" data-en="Illustration" data-cn="插画">Illustration</span>
+        </div>
+
+        <!-- 3 ── Project Cards ──────────────── -->
+        <div class="project-list">
+
+            <!-- Project 01 -->
+            <div class="project-card fade-in">
+                <div class="project-tab">PROJECT 01</div>
+                <div class="project-body">
+                    <div class="tape"></div>
+
+                 
+                    <h2 class="project-name"
+                        data-en="Marketing Visual Design"
+                        data-cn="营销视觉设计">Marketing Visual Design</h2>
+                    <div class="project-type"
+                        data-en="Campaign Visual / E-commerce"
+                        data-cn="营销视觉 / 电商">Campaign Visual / E-commerce</div>
+
+                    <p class="project-desc"
+                        data-en="A set of commercial visual designs built for online communication, promotion, and conversion."
+                        data-cn="一组面向线上传播、活动促销与转化目标的商业视觉设计。">
+                        A set of commercial visual designs built for online communication, promotion, and conversion.
+                    </p>
+
+                    <div class="project-meta">
+                        <span class="meta-chip year">2022–2024</span>
+                        <span class="meta-chip">Photoshop</span>
+                        <span class="meta-chip">Illustrator</span>
+                        <span class="meta-chip">After Effects</span>
+                    </div>
+
+                    <a href="project-01.html" class="project-link"
+                        data-en="View Case →"
+                        data-cn="查看案例 →">View Case →</a>
+                </div>
+            </div>
+
+            <!-- Project 02 -->
+            <div class="project-card fade-in">
+                <div class="project-tab">PROJECT 02</div>
+                <div class="project-body">
+                    <div class="tape"></div>
+
+                   
+                    <h2 class="project-name"
+                        data-en="Operation Visual System"
+                        data-cn="运营视觉系统">Operation Visual System</h2>
+                    <div class="project-type"
+                        data-en="Operation / Visual System"
+                        data-cn="运营 / 视觉系统">Operation / Visual System</div>
+
+                    <p class="project-desc"
+                        data-en="A visual system for platform operation, combining information structure, visual consistency, and user attention."
+                        data-cn="一套服务于平台运营的视觉系统，整合信息结构、视觉统一性与用户注意力。">
+                        A visual system for platform operation, combining information structure, visual consistency, and user attention.
+                    </p>
+
+                    <div class="project-meta">
+                        <span class="meta-chip year">2022–2024</span>
+                        <span class="meta-chip">Photoshop</span>
+                        <span class="meta-chip">Illustrator</span>
+                        <span class="meta-chip">Figma</span>
+                    </div>
+
+                    <a href="project-02.html" class="project-link"
+                        data-en="View Case →"
+                        data-cn="查看案例 →">View Case →</a>
+                </div>
+            </div>
+
+            <!-- Project 03 -->
+            <div class="project-card fade-in">
+                <div class="project-tab">PROJECT 03</div>
+                <div class="project-body">
+                    <div class="tape"></div>
+
+                   
+                    <h2 class="project-name"
+                        data-en="Brand Identity Design"
+                        data-cn="品牌视觉识别设计">Brand Identity Design</h2>
+                    <div class="project-type"
+                        data-en="Branding / Brand Identity / Packaging"
+                        data-cn="品牌识别 / 包装">Brand Identity / Packaging</div>
+
+                    <p class="project-desc"
+                        data-en="A brand identity project exploring how visual language can shape emotion, memory, and recognition."
+                        data-cn="一个品牌视觉识别项目，探索视觉语言如何塑造情绪、记忆与识别度。">
+                        A brand identity project exploring how visual language can shape emotion, memory, and recognition.
+                    </p>
+
+                    <div class="project-meta">
+                        <span class="meta-chip year">2024–2025</span>
+                        <span class="meta-chip">Illustrator</span>
+                        <span class="meta-chip">Photoshop</span>
+                        <span class="meta-chip">AI tools</span>
+                    </div>
+
+                    <a href="project-03.html" class="project-link"
+                        data-en="View Case →"
+                        data-cn="查看案例 →">View Case →</a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 4 ── Footer ─────────────────────── -->
+        <div class="page-end fade-in"
+            data-en="more projects are still being organized in this room."
+            data-cn="还有一些项目，正在这个房间里慢慢整理。">
+            more projects are still being organized in this room.
+        </div>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let currentLang = 'en';
+
+        function switchLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-en]').forEach(function(el) {
+                el.innerHTML = el.getAttribute('data-' + lang);
+            });
+            document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+            document.getElementById('btnCN').classList.toggle('active', lang === 'cn');
+            localStorage.setItem('preferredLang', lang);
+        }
+
+        (function() {
+            var saved = localStorage.getItem('preferredLang') || 'en';
+            switchLang(saved);
+        })();
+    </script>
+
+</body>
+</html>

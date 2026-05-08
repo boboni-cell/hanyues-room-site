@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Room That Grows With Me</title>
+    <style>
+        /* ============================================
+           基础重置
+        ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f0e8;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           顶部导航
+        ============================================ */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: rgba(245, 240, 232, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            z-index: 1000;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        .nav-link {
+            color: #2d2d2d;
+            text-decoration: none;
+            font-weight: 400;
+            padding: 8px 12px;
+            transition: opacity 0.3s;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            opacity: 0.6;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 12px;
+            right: 12px;
+            height: 1px;
+            background-color: #2d2d2d;
+        }
+
+        /* ============================================
+           语言切换按钮
+        ============================================ */
+        .lang-switcher {
+            position: fixed;
+            top: 0;
+            right: 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            z-index: 1001;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            font-size: 12px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            padding: 5px 7px;
+            color: #888;
+            transition: color 0.2s;
+            font-family: inherit;
+        }
+
+        .lang-btn:hover {
+            color: #2d2d2d;
+        }
+
+        .lang-btn.active {
+            color: #2d2d2d;
+            font-weight: 600;
+            border-bottom: 1px solid #2d2d2d;
+        }
+
+        .lang-divider {
+            color: #ccc;
+            font-size: 11px;
+            line-height: 1;
+        }
+
+        /* ============================================
+           房间主体容器
+        ============================================ */
+        .room-container {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            background: linear-gradient(180deg, #e8dcc8 0%, #d4c4b0 70%, #c4965f 100%);
+            position: relative;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .room {
+            width: 100%;
+            max-width: 1400px;
+            height: 700px;
+            position: relative;
+            background-color: #f5ede0;
+            border: 2px solid #2d2d2d;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        /* ============================================
+           墙面和地板
+        ============================================ */
+        .wall {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 65%;
+            background: linear-gradient(180deg, #f5ede0 0%, #ede4d4 100%);
+        }
+
+        .floor {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 35%;
+            background: linear-gradient(180deg, #d4a574 0%, #c4965f 100%);
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 80px,
+                rgba(0, 0, 0, 0.05) 80px,
+                rgba(0, 0, 0, 0.05) 82px
+            );
+        }
+
+        /* ============================================
+           可点击物件 - 通用样式
+        ============================================ */
+        .clickable {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #2d2d2d;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #2d2d2d;
+            text-align: center;
+            font-weight: 500;
+            user-select: none;
+        }
+
+        .clickable:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background-color: #fffbf0;
+        }
+
+        .clickable .label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* ============================================
+           窗户 - CONTACT
+        ============================================ */
+        .window {
+            top: 8%;
+            left: 35%;
+            width: 200px;
+            height: 240px;
+            background: linear-gradient(180deg, #b8c8d8 0%, #8ba8c8 100%);
+            border: 3px solid #6b5b47;
+        }
+
+        .window::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #6b5b47;
+        }
+
+        .window::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 3px;
+            background-color: #6b5b47;
+        }
+
+        .window-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* ============================================
+           书桌 + 电脑 (左侧工作区)
+        ============================================ */
+        .desk {
+            position: absolute;
+            bottom: 25%;
+            left: 5%;
+            width: 280px;
+            height: 90px;
+            background: linear-gradient(180deg, #b88a5a 0%, #8b6f47 100%);
+            border: 2px solid #2d2d2d;
+        }
+
+        .desk-leg {
+            position: absolute;
+            bottom: -100px;
+            width: 8px;
+            height: 100px;
+            background-color: #8b6f47;
+            border: 1px solid #2d2d2d;
+        }
+
+        .desk-leg.left { left: 10px; }
+        .desk-leg.right { right: 10px; }
+
+        .computer {
+            top: 28%;
+            left: 8%;
+            width: 160px;
+            height: 110px;
+            background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+            border: 2px solid #2d2d2d;
+            border-radius: 4px;
+            color: #fff;
+        }
+
+        .computer .screen-content {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            background-color: #4a90e2;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 11px;
+        }
+
+        .computer-stand {
+            position: absolute;
+            top: calc(28% + 110px);
+            left: calc(8% + 60px);
+            width: 40px;
+            height: 30px;
+            background-color: #2d2d2d;
+            border: 2px solid #2d2d2d;
+        }
+
+        /* ============================================
+           台灯
+        ============================================ */
+        .lamp {
+            position: absolute;
+            bottom: calc(25% + 90px);
+            left: 22%;
+            width: 50px;
+            height: 70px;
+        }
+
+        .lamp-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 8px;
+            background-color: #6b5b47;
+            border: 1px solid #2d2d2d;
+        }
+
+        .lamp-arm {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            width: 4px;
+            height: 40px;
+            background-color: #6b5b47;
+        }
+
+        .lamp-shade {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 25px solid #d4a574;
+        }
+
+        /* ============================================
+           书架 (右侧)
+        ============================================ */
+        .bookshelf {
+            top: 18%;
+            right: 5%;
+            width: 180px;
+            height: 380px;
+            background: linear-gradient(180deg, #a07a52 0%, #8b6f47 100%);
+            flex-direction: column;
+            padding: 10px;
+            gap: 8px;
+        }
+
+        .shelf-row {
+            flex: 1;
+            background-color: #f5ede0;
+            border: 1px solid #6b5b47;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 4px;
+        }
+
+        .book {
+            width: 12px;
+            height: 80%;
+            background-color: var(--book-color, #c44);
+            border: 1px solid #2d2d2d;
+        }
+
+        /* ============================================
+           灵感墙 / 便利贴墙
+        ============================================ */
+        .inspiration-wall {
+            top: 8%;
+            left: 8%;
+            width: 180px;
+            height: 130px;
+            background-color: #fffbf0;
+            flex-wrap: wrap;
+            padding: 8px;
+            gap: 4px;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+
+        .sticky-note {
+            width: 45px;
+            height: 45px;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2d2d2d;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transform: rotate(var(--rotate, 0deg));
+        }
+
+        .sticky-note.yellow { background-color: #fff8b8; }
+        .sticky-note.pink { background-color: #ffd4d4; }
+        .sticky-note.blue { background-color: #c8e0f0; }
+        .sticky-note.green { background-color: #d4e8c8; }
+
+        /* ============================================
+           床 (中右侧)
+        ============================================ */
+        .bed {
+            position: absolute;
+            bottom: 18%;
+            right: 25%;
+            width: 320px;
+            height: 140px;
+            background: linear-gradient(180deg, #d4c4b0 0%, #b8a890 100%);
+            border: 2px solid #2d2d2d;
+            border-radius: 4px;
+        }
+
+        .bed-pillow {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            width: 70px;
+            height: 50px;
+            background-color: #f5ede0;
+            border: 1px solid #2d2d2d;
+            border-radius: 4px;
+        }
+
+        .bed-blanket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(180deg, #c4a890 0%, #a89070 100%);
+            border-top: 1px solid #2d2d2d;
+        }
+
+        /* ============================================
+           海燕 (猫)
+        ============================================ */
+        .cat {
+            position: absolute;
+            bottom: calc(18% + 60px);
+            right: 30%;
+            width: 80px;
+            height: 60px;
+            background-color: #8b7355;
+            border: 2px solid #2d2d2d;
+            border-radius: 50% 50% 30% 30%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .cat:hover {
+            transform: scale(1.05);
+        }
+
+        .cat::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 15%;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 12px solid #8b7355;
+        }
+
+        .cat::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            right: 15%;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 12px solid #8b7355;
+        }
+
+        .cat-label {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 2px 6px;
+            border-radius: 2px;
+            margin-top: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .cat:hover .cat-label {
+            opacity: 1;
+        }
+
+        /* ============================================
+           小音响 (PLAYLIST)
+        ============================================ */
+        .speaker {
+            bottom: 22%;
+            right: 8%;
+            width: 70px;
+            height: 90px;
+            background: linear-gradient(180deg, #6b5b47 0%, #4a3d2f 100%);
+            color: #fff;
+            border-radius: 4px;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .speaker-circle {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #d4a574;
+            border-radius: 50%;
+            background-color: #2d2d2d;
+        }
+
+        /* ============================================
+           棒球服 (椅子上)
+        ============================================ */
+        .jacket {
+            position: absolute;
+            bottom: 12%;
+            left: 22%;
+            width: 90px;
+            height: 110px;
+            background: linear-gradient(180deg, #f5ede0 0%, #d4c4b0 100%);
+            border: 2px solid #2d2d2d;
+            border-radius: 4px 4px 8px 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: #2d2d2d;
+            text-align: center;
+            line-height: 1.3;
+            font-weight: 600;
+        }
+
+        .jacket:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ============================================
+           BGM 控制按钮
+        ============================================ */
+        .bgm-control {
+            position: absolute;
+            bottom: 18%;
+            right: 4%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #2d2d2d;
+            padding: 6px 12px;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            color: #2d2d2d;
+        }
+
+        .bgm-control:hover {
+            background-color: #fffbf0;
+        }
+
+        /* ============================================
+           Explore 按钮 + 欢迎文字
+        ============================================ */
+        .welcome-text {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #2d2d2d;
+        }
+
+        .welcome-text .greeting {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text .title {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+
+        .welcome-text .subtitle {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .explore-btn {
+            display: inline-block;
+            padding: 10px 30px;
+            background-color: transparent;
+            border: 1px solid #2d2d2d;
+            color: #2d2d2d;
+            font-size: 11px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .explore-btn:hover {
+            background-color: #2d2d2d;
+            color: #f5ede0;
+        }
+
+        /* ============================================
+           联系弹窗
+        ============================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: #f5ede0;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #2d2d2d;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            color: #2d2d2d;
+        }
+
+        .modal-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 28px;
+            letter-spacing: 1px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .contact-label {
+            font-size: 10px;
+            color: #888;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .contact-value {
+            font-size: 14px;
+            color: #2d2d2d;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background-color: transparent;
+            border: 1px solid #2d2d2d;
+            padding: 6px 14px;
+            font-size: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            margin-left: 12px;
+            white-space: nowrap;
+            color: #2d2d2d;
+        }
+
+        .copy-btn:hover {
+            background-color: #2d2d2d;
+            color: #f5ede0;
+        }
+
+        .copy-btn.copied {
+            background-color: #6b8e6b;
+            color: #fff;
+            border-color: #6b8e6b;
+        }
+
+        /* ============================================
+           响应式 (基础)
+        ============================================ */
+        @media (max-width: 768px) {
+            .top-nav {
+                justify-content: flex-start;
+                padding-left: 16px;
+                padding-right: 92px;
+                gap: 10px;
+                font-size: 10px;
+                letter-spacing: 0.6px;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .top-nav::-webkit-scrollbar { display: none; }
+
+            .nav-link {
+                flex: 0 0 auto;
+                padding: 8px 8px;
+            }
+
+            .lang-switcher {
+                top: 8px;
+                right: 10px;
+                height: auto;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 4px;
+            }
+
+            .lang-divider {
+                display: none;
+            }
+
+            .lang-btn {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+
+            .room {
+                height: 500px;
+            }
+
+            .room-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         顶部导航
+    ============================================ -->
+    <nav class="top-nav">
+        <a href="about.html" class="nav-link">ABOUT</a>
+        <a href="work.html" class="nav-link">WORK</a>
+        <a href="index.html" class="nav-link active">ROOM</a>
+        <a href="thoughts.html" class="nav-link">THOUGHTS</a>
+        <a href="playlist.html" class="nav-link">PLAYLIST</a>
+    </nav>
+
+    <!-- ============================================
+         语言切换按钮
+    ============================================ -->
+    <div class="lang-switcher">
+        <button class="lang-btn" id="btnEN" onclick="switchLang('en')">EN</button>
+        <span class="lang-divider">/</span>
+        <button class="lang-btn" id="btnCN" onclick="switchLang('cn')">CN</button>
+    </div>
+
+    <!-- ============================================
+         房间主体
+    ============================================ -->
+    <div class="room-container">
+        <div class="room">
+            
+            <!-- 背景层：墙和地板 -->
+            <div class="wall"></div>
+            <div class="floor"></div>
+
+            <!-- ============================================
+                 P0: 灵感墙 -> thoughts.html
+            ============================================ -->
+            <div class="clickable inspiration-wall" data-target="thoughts" onclick="navigateTo('thoughts.html')">
+                <div class="sticky-note yellow" style="--rotate: -3deg;">idea</div>
+                <div class="sticky-note pink" style="--rotate: 2deg;">note</div>
+                <div class="sticky-note blue" style="--rotate: -1deg;">todo</div>
+                <div class="sticky-note green" style="--rotate: 4deg;">draft</div>
+                <div class="sticky-note yellow" style="--rotate: -2deg;">log</div>
+                <div class="sticky-note pink" style="--rotate: 3deg;">✦</div>
+                <div style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 9px; color: #888; letter-spacing: 1px;">THOUGHTS</div>
+            </div>
+
+            <!-- ============================================
+                 P0: 窗户 -> 联系弹窗
+            ============================================ -->
+            <div class="clickable window" data-target="contact" onclick="openContactModal()">
+                <div class="window-label">CONTACT</div>
+            </div>
+
+            <!-- ============================================
+                 P0: 电脑屏幕 -> work.html
+            ============================================ -->
+            <div class="clickable computer" data-target="work" onclick="navigateTo('work.html')">
+                <div class="screen-content">WORK</div>
+            </div>
+            <div class="computer-stand"></div>
+
+            <!-- 书桌 (装饰) -->
+            <div class="desk">
+                <div class="desk-leg left"></div>
+                <div class="desk-leg right"></div>
+            </div>
+
+            <!-- 台灯 (V1暂不交互) -->
+            <div class="lamp">
+                <div class="lamp-shade"></div>
+                <div class="lamp-arm"></div>
+                <div class="lamp-base"></div>
+            </div>
+
+            <!-- ============================================
+                 P1: 棒球服 -> about.html#education
+            ============================================ -->
+            <div class="jacket" onclick="navigateTo('about.html#education')">
+                HANYANG<br>UNIV.<br><span style="font-size: 7px; color: #888;">EDU</span>
+            </div>
+
+            <!-- ============================================
+                 P0: 书架 -> about.html
+            ============================================ -->
+            <div class="clickable bookshelf" data-target="about" onclick="navigateTo('about.html')">
+                <div class="shelf-row">
+                    <div class="book" style="--book-color: #8b3a3a;"></div>
+                    <div class="book" style="--book-color: #3a5a8b;"></div>
+                    <div class="book" style="--book-color: #6b5b3a;"></div>
+                    <div class="book" style="--book-color: #5a8b6b;"></div>
+                    <div class="book" style="--book-color: #8b6b3a;"></div>
+                </div>
+                <div class="shelf-row">
+                    <div class="book" style="--book-color: #6b3a5a;"></div>
+                    <div class="book" style="--book-color: #3a6b5a;"></div>
+                    <div class="book" style="--book-color: #8b5a3a;"></div>
+                    <div class="book" style="--book-color: #5a3a6b;"></div>
+                </div>
+                <div class="shelf-row">
+                    <div class="book" style="--book-color: #3a3a6b;"></div>
+                    <div class="book" style="--book-color: #6b8b3a;"></div>
+                    <div class="book" style="--book-color: #8b3a6b;"></div>
+                    <div class="book" style="--book-color: #3a8b8b;"></div>
+                    <div class="book" style="--book-color: #5a5a3a;"></div>
+                </div>
+                <div style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 9px; color: #888; letter-spacing: 1px;">ABOUT</div>
+            </div>
+
+            <!-- 床 (装饰) -->
+            <div class="bed">
+                <div class="bed-blanket"></div>
+                <div class="bed-pillow"></div>
+            </div>
+
+            <!-- ============================================
+                 P1: 海燕 (点击播放猫叫)
+            ============================================ -->
+            <div class="cat" onclick="meowSound()">
+                <span class="cat-label" data-en="Haiyan · click me" data-cn="海燕 · 点我">Haiyan · click me</span>
+            </div>
+
+            <!-- ============================================
+                 P0: 小音响 -> playlist.html
+            ============================================ -->
+            <div class="clickable speaker" data-target="playlist" onclick="navigateTo('playlist.html')">
+                <div class="speaker-circle"></div>
+                <div style="font-size: 8px; letter-spacing: 1px;">PLAYLIST</div>
+            </div>
+
+            <!-- ============================================
+                 P1: BGM 控制按钮
+            ============================================ -->
+            <button class="bgm-control" id="bgmBtn" onclick="toggleBGM()"
+                data-en="♪ play room bgm" data-cn="♪ 播放房间BGM">
+                ♪ play room bgm
+            </button>
+
+            <!-- ============================================
+                 欢迎文字 + Explore 按钮
+            ============================================ -->
+            <div class="welcome-text">
+                <div class="greeting" data-en="· welcome to ·" data-cn="· 欢迎来到 ·">· welcome to ·</div>
+                <div class="title">MY ROOM</div>
+                <div class="subtitle"
+                    data-en="a little corner of the internet<br>where i make things and collect moments."
+                    data-cn="这是我在互联网上的小角落<br>我在这里创作，也在这里收藏。">
+                    a little corner of the internet<br>where i make things and collect moments.
+                </div>
+                <a href="work.html" class="explore-btn" data-en="EXPLORE" data-cn="探索">EXPLORE</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================
+         联系弹窗
+    ============================================ -->
+    <div class="modal-overlay" id="contactModal" onclick="closeContactModalOnOverlay(event)">
+        <div class="modal">
+            <button class="modal-close" onclick="closeContactModal()">×</button>
+            <div class="modal-title" data-en="say hi ✿" data-cn="来找我 ✿">say hi ✿</div>
+            <div class="modal-subtitle" data-en="find me through the window" data-cn="透过窗户找到我">find me through the window</div>
+            
+            <div class="contact-item">
+                <div class="contact-info">
+                    <div class="contact-label">EMAIL</div>
+                    <div class="contact-value">zhyyyy0706@gmail.com</div>
+                </div>
+                <button class="copy-btn" onclick="copyToClipboard('zhyyyy0706@gmail.com', this)">COPY</button>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-info">
+                    <div class="contact-label">WECHAT</div>
+                    <div class="contact-value">lhlhzhy</div>
+                </div>
+                <button class="copy-btn" onclick="copyToClipboard('lhlhzhy', this)">COPY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         音频接口 (V1预留 - 替换 src 即可启用)
+    ============================================ -->
+    <audio id="meowAudio" preload="auto">
+        <!-- TODO: 替换为真实猫叫音频 -->
+        <!-- <source src="assets/audio/meow.mp3" type="audio/mpeg"> -->
+    </audio>
+
+    <audio id="bgmAudio" preload="auto" loop>
+        <!-- TODO: 替换为真实BGM音频 -->
+        <!-- <source src="assets/audio/room-bgm.mp3" type="audio/mpeg"> -->
+    </audio>
+
+    <!-- ============================================
+         JavaScript 交互逻辑
+    ============================================ -->
+    <script>
+        // ============================================
+        // 页面跳转
+        // ============================================
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+
+        // ============================================
+        // 联系弹窗
+        // ============================================
+        function openContactModal() {
+            document.getElementById('contactModal').classList.add('active');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModal').classList.remove('active');
+        }
+
+        function closeContactModalOnOverlay(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeContactModal();
+            }
+        }
+
+        // ESC 键关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeContactModal();
+            }
+        });
+
+        // ============================================
+        // 复制到剪贴板
+        // ============================================
+        function copyToClipboard(text, btn) {
+            // 优先使用现代 API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopySuccess(btn);
+                }).catch(() => {
+                    fallbackCopy(text, btn);
+                });
+            } else {
+                fallbackCopy(text, btn);
+            }
+        }
+
+        function fallbackCopy(text, btn) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showCopySuccess(btn);
+            } catch (err) {
+                alert('复制失败，请手动复制：' + text);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showCopySuccess(btn) {
+            const originalText = btn.textContent;
+            btn.textContent = 'COPIED ✓';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('copied');
+            }, 1500);
+        }
+
+        // ============================================
+        // 海燕 - 猫叫音效
+        // ============================================
+        function meowSound() {
+            const audio = document.getElementById('meowAudio');
+            // 检查音频源是否可用
+            if (audio.querySelector('source') || audio.src) {
+                audio.currentTime = 0;
+                audio.play().catch(err => {
+                    console.log('音频播放失败：', err);
+                });
+            } else {
+                // 占位符提示（开发阶段用，真实音频替换后会自动启用）
+                console.log('🐱 海燕叫了一声！(请替换 meow.mp3 后启用真实音效)');
+            }
+        }
+
+        // ============================================
+        // BGM 控制
+        // ============================================
+        let bgmPlaying = false;
+
+        function toggleBGM() {
+            const audio = document.getElementById('bgmAudio');
+            const btn = document.getElementById('bgmBtn');
+            
+            if (!bgmPlaying) {
+                // 检查音频源
+                if (audio.querySelector('source') || audio.src) {
+                    audio.play().then(() => {
+                        bgmPlaying = true;
+                        btn.innerHTML = '♪ pause bgm';
+                    }).catch(err => {
+                        console.log('BGM播放失败：', err);
+                        btn.innerHTML = '♪ bgm not loaded';
+                    });
+                } else {
+                    console.log('🎵 BGM播放中...(请替换 room-bgm.mp3 后启用)');
+                    bgmPlaying = true;
+                    btn.innerHTML = '♪ pause bgm (demo)';
+                }
+            } else {
+                audio.pause();
+                bgmPlaying = false;
+                btn.innerHTML = '♪ play room bgm';
+            }
+        }
+
+        // 页面切换时停止BGM (返回首页前清理)
+        window.addEventListener('beforeunload', function() {
+            const audio = document.getElementById('bgmAudio');
+            if (!audio.paused) {
+                audio.pause();
+            }
+        });
+
+        // ============================================
+        // V2 预留接口 (后续添加动效用)
+        // ============================================
+        // window.toggleDayNight = function() { ... }
+        // window.animatePerson = function() { ... }
+        // window.curtainAnimation = function() { ... }
+
+        // ============================================
+        // 双语切换
+        // 使用方法：给任意元素加 data-en="英文" data-cn="中文"
+        // 切换时自动更新 innerHTML。新手维护：
+        // 只需修改 HTML 里对应的 data-en / data-cn 属性值即可。
+        // ============================================
+        let currentLang = 'en'; // 默认英文
+
+        function switchLang(lang) {
+            currentLang = lang;
+
+            // 更新所有带 data-en / data-cn 的元素
+            document.querySelectorAll('[data-en]').forEach(function(el) {
+                el.innerHTML = el.getAttribute('data-' + lang);
+            });
+
+            // BGM 按钮特殊处理：播放中时文字不一样
+            const bgmBtn = document.getElementById('bgmBtn');
+            if (bgmPlaying) {
+                bgmBtn.innerHTML = lang === 'cn' ? '♪ 暂停BGM' : '♪ pause bgm';
+            }
+
+            // 高亮当前语言按钮
+            document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+            document.getElementById('btnCN').classList.toggle('active', lang === 'cn');
+
+            // 记住用户的语言选择（刷新页面后保持）
+            localStorage.setItem('preferredLang', lang);
+        }
+
+        // 页面加载时读取上次的语言偏好
+        (function initLang() {
+            const saved = localStorage.getItem('preferredLang') || 'en';
+            switchLang(saved);
+        })();
+    </script>
+
+</body>
+</html>
